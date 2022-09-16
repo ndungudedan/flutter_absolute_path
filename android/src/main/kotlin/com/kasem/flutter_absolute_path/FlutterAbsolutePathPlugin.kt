@@ -13,28 +13,31 @@ import android.util.Log
 import android.content.pm.ProviderInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageInfo
+import androidx.annotation.NonNull
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 import java.security.Provider
 
 
-class FlutterAbsolutePathPlugin(private val context: Context) : MethodCallHandler, FlutterPlugin  {
+class FlutterAbsolutePathPlugin(): MethodCallHandler, FlutterPlugin {
+    private lateinit var applicationContext: Context
 
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        this.applicationContext=binding.applicationContext
+        val channel = MethodChannel(binding.binaryMessenger, "flutter_absolute_path")
+        channel.setMethodCallHandler(FlutterAbsolutePathPlugin())
+    }
 
-  @Override
-  public void onAttachedToEngine(FlutterPluginBinding binding) {
-  }
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        TODO("Not yet implemented")
+    }
 
-  @Override
-  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-   
-  }
-
-    companion object {
+/*companion    companion object {
         @JvmStatic
         fun registerWith(registrar: Registrar) {
             val channel = MethodChannel(registrar.messenger(), "flutter_absolute_path")
-            channel.setMethodCallHandler(FlutterAbsolutePathPlugin(registrar.context()))
+            channel.setMethodCallHandler(FlutterAbsolutePathPlugin())
         }
-    }
+    }*/
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when {
@@ -49,7 +52,7 @@ class FlutterAbsolutePathPlugin(private val context: Context) : MethodCallHandle
 //                    return
 //                }
 
-                result.success(FileDirectory.getAbsolutePath(this.context, uri))
+                result.success(FileDirectory.getAbsolutePath(this.applicationContext, uri))
             }
             else -> result.notImplemented()
         }
