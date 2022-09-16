@@ -9,7 +9,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import android.util.Log
 import android.content.pm.ProviderInfo
 import android.content.pm.PackageManager
@@ -17,20 +16,25 @@ import android.content.pm.PackageInfo
 import java.security.Provider
 
 
-class FlutterAbsolutePathPlugin() : MethodCallHandler, FlutterPlugin  {
-    private lateinit var context:Context
+class FlutterAbsolutePathPlugin(private val context: Context) : MethodCallHandler, FlutterPlugin  {
+
 
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
-      this.context=binding.getApplicationContext()
-        val channel = MethodChannel(binding.getBinaryMessenger(), "flutter_absolute_path")
-        channel.setMethodCallHandler(FlutterAbsolutePathPlugin(this))
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
    
   }
+
+    companion object {
+        @JvmStatic
+        fun registerWith(registrar: Registrar) {
+            val channel = MethodChannel(registrar.messenger(), "flutter_absolute_path")
+            channel.setMethodCallHandler(FlutterAbsolutePathPlugin(registrar.context()))
+        }
+    }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when {
